@@ -10,6 +10,13 @@ namespace CycleDetection.Optimizations;
 /// </summary>
 public sealed class UnsafeDfsDetector : ICycleDetector
 {
+    /// <summary>
+    /// Detects if a cycle exists in a 2D grid using unsafe optimized iterative DFS.
+    /// </summary>
+    /// <param name="grid">Flattened 1D array representing the grid</param>
+    /// <param name="rows">Number of rows in the grid</param>
+    /// <param name="cols">Number of columns in the grid</param>
+    /// <returns>True if a cycle exists, false otherwise</returns>
     public bool HasCycle(char[] grid, int rows, int cols)
     {
         if (grid == null || grid.Length == 0 || rows <= 0 || cols <= 0)
