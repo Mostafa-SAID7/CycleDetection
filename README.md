@@ -1,33 +1,36 @@
-# CycleDetection
+# 🔄 CycleDetection
 
-High-performance cycle detection library for 2D grids with multiple optimization strategies.
+[![NuGet Version](https://img.shields.io/nuget/v/CycleDetection.svg?style=flat-square)](https://www.nuget.org/packages/CycleDetection/)
+[![Build Status](https://img.shields.io/github/actions/workflow/status/yourusername/CycleDetection/dotnet-publish.yml?branch=main&style=flat-square)](https://github.com/yourusername/CycleDetection/actions)
+[![License](https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square)](LICENSE)
 
-## Features
+**CycleDetection** is a high-performance .NET library for detecting cycles in 2D grids. It provides multiple optimization strategies, including iterative DFS with `Span<T>` and an `Unsafe` version for maximum performance.
+
+---
+
+## 🚀 Features
 
 - **Three Implementation Strategies**
-  - Standard DFS (baseline)
-  - Optimized (Span, stackalloc, iterative)
-  - Unsafe (pointer arithmetic, aggressive inlining)
+  - **Standard DFS**: Baseline recursive implementation.
+  - **Optimized DFS**: Iterative DFS using `Span<T>` and `stackalloc`.
+  - **Unsafe DFS**: High-performance detector using pointer arithmetic.
+- **Source Generated Grid Flattening**: High-performance `FlattenFast` method generated at compile time.
+- **Performance Optimized**: Contiguous memory layout, zero-allocation for small grids, and aggressive inlining.
+- **Clean Architecture**: SOLID principles, Dependency Injection support, and extensible design.
 
-- **Performance Optimizations**
-  - Contiguous memory layout (1D arrays)
-  - Zero-allocation for small grids (stackalloc)
-  - Unsigned integer comparisons for bounds checking
-  - Aggressive inlining
-  - No exceptions in hot paths
+---
 
-- **Clean Architecture**
-  - SOLID principles
-  - Dependency injection support
-  - Extensible design
+## 📦 Installation
 
-## Installation
+Install the package via NuGet:
 
 ```bash
 dotnet add package CycleDetection
 ```
 
-## Usage
+---
+
+## 🛠️ Usage
 
 ### Basic Usage
 
@@ -35,7 +38,7 @@ dotnet add package CycleDetection
 using CycleDetection.Abstractions;
 using CycleDetection.Core;
 
-// Create a detector
+// Create a detector (Optimized is recommended)
 ICycleDetector detector = new OptimizedDfsDetector();
 
 // Prepare grid (flattened 1D array)
@@ -67,7 +70,9 @@ var detector = provider.GetRequiredService<ICycleDetector>();
 bool hasCycle = detector.HasCycle(grid, rows, cols);
 ```
 
-### Grid Flattening
+### High-Performance Grid Flattening (Source Generated)
+
+Use the source-generated `FlattenFast` extension method for optimal performance when converting a jagged array to a 1D array:
 
 ```csharp
 using CycleDetection.Extensions;
@@ -79,112 +84,53 @@ char[][] grid2D = new[]
     new[] { 'a', 'a', 'a' }
 };
 
-// Flatten to 1D array
-char[] flattened = grid2D.Flatten();
-
-// Or use Span for zero-allocation
-Span<char> buffer = stackalloc char[9];
-grid2D.FlattenToSpan(buffer);
+// Flatten to 1D array using source-generated method
+char[] flattened = grid2D.FlattenFast();
 ```
 
-## Strategies
+---
 
-### Standard DFS
-- Baseline recursive implementation
-- Good for understanding the algorithm
-- Higher memory usage due to recursion
+## 📊 Performance
 
-### Optimized
-- Iterative DFS with Span
-- Uses stackalloc for grids ≤ 100x100
-- Recommended for most use cases
-- ~2-3x faster than Standard
-
-### Unsafe
-- Pointer arithmetic
-- Aggressive inlining
-- Best performance for large grids
-- Requires `AllowUnsafeBlocks` in project
-
-## Performance
-
-Benchmark results (relative to Standard):
+Benchmark results relative to the Standard DFS implementation:
 
 | Grid Size | Optimized | Unsafe |
 |-----------|-----------|--------|
-| 100x100   | 2.5x      | 3.2x   |
-| 500x500   | 2.8x      | 3.5x   |
-| 1000x1000 | 2.9x      | 3.6x   |
+| 100x100   | **2.5x**  | **3.2x** |
+| 500x500   | **2.8x**  | **3.5x** |
+| 1000x1000 | **2.9x**  | **3.6x** |
 
-Memory allocations:
-- Standard: ~1 allocation per grid
-- Optimized: 0 allocations for grids ≤ 100x100
-- Unsafe: 0 allocations for grids ≤ 100x100
+**Memory Allocations:**
+- **Standard**: ~1 allocation per grid.
+- **Optimized/Unsafe**: **0 allocations** for grids ≤ 100x100 (uses `stackalloc`).
 
-## Running Benchmarks
+---
 
+## 🧪 Running Tests & Benchmarks
+
+**Run Unit Tests:**
+```bash
+dotnet test
+```
+
+**Run Benchmarks:**
 ```bash
 cd benchmarks/CycleDetection.Benchmarks
 dotnet run -c Release
 ```
 
-## Running Tests
+---
 
-```bash
-dotnet test
-```
+## 🗺️ Project Structure
 
-## API Reference
+- `src/CycleDetection`: Core library with all implementation strategies.
+- `src/CycleDetection.SourceGenerators`: Roslyn source generator for grid extensions.
+- `tests/CycleDetection.Tests`: Comprehensive xUnit test suite.
+- `benchmarks/CycleDetection.Benchmarks`: BenchmarkDotNet performance tests.
+- `docs/`: Supplemental documentation, changelog, and security policy.
 
-### ICycleDetector
+---
 
-```csharp
-bool HasCycle(char[] grid, int rows, int cols);
-```
+## 📄 License
 
-Detects if a cycle exists in a 2D grid.
-
-**Parameters:**
-- `grid`: Flattened 1D array representing the grid
-- `rows`: Number of rows
-- `cols`: Number of columns
-
-**Returns:** `true` if a cycle exists, `false` otherwise
-
-### GridExtensions
-
-```csharp
-char[] Flatten(this char[][] grid);
-void FlattenToSpan(this char[][] grid, Span<char> destination);
-int GetFlatIndex(int row, int col, int cols);
-(int row, int col) GetRowCol(int index, int cols);
-```
-
-## Architecture
-
-```
-src/CycleDetection/
-├── Abstractions/
-│   └── ICycleDetector.cs
-├── Core/
-│   └── StandardDfsDetector.cs
-├── Optimizations/
-│   ├── OptimizedDfsDetector.cs
-│   └── UnsafeDfsDetector.cs
-├── Extensions/
-│   └── GridExtensions.cs
-└── DependencyInjection/
-    ├── CycleDetectionOptions.cs
-    └── ServiceCollectionExtensions.cs
-```
-
-## Publishing to NuGet
-
-1. Update version in `src/CycleDetection/CycleDetection.csproj`
-2. Create a git tag: `git tag v1.0.0`
-3. Push to main: `git push origin main --tags`
-4. GitHub Actions will automatically publish to NuGet
-
-## License
-
-MIT
+This project is licensed under the **MIT License**. See the [LICENSE](LICENSE) file for details.

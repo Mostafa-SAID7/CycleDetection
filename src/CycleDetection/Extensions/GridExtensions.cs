@@ -6,7 +6,7 @@ namespace CycleDetection.Extensions;
 /// <summary>
 /// Extension methods for grid operations.
 /// </summary>
-public static class GridExtensions
+public static partial class GridExtensions
 {
     /// <summary>
     /// Flattens a 2D jagged array into a 1D array.
