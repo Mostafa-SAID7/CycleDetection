@@ -25,13 +25,13 @@ jobs:
       run: dotnet restore
 
     - name: Build
-      run: dotnet build --configuration Release --no-restore
+      run: dotnet build CycleDetection.sln --configuration Release --no-restore
 
     - name: Run tests
       run: dotnet test --configuration Release --no-build --verbosity normal
 
     - name: Pack NuGet package
-      run: dotnet pack src/CycleDetection/CycleDetection.csproj --configuration Release --output ./nupkg --no-build
+      run: dotnet pack src/CycleDetection/CycleDetection.csproj --configuration Release --output ./nupkg
 
     - name: Upload artifacts
       uses: actions/upload-artifact@v4
